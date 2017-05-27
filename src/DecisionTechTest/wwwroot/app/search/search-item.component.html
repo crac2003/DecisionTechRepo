@@ -1,0 +1,35 @@
+﻿
+<div class="deal-data">
+    <div class="deal-title">{{item.title}}</div>
+    <div class="deal-period">
+        <div *ngIf="item.periods">
+            {{item.periods[0].months}} months
+        </div>
+    </div>
+    <div class="deal-bb">
+        <div *ngIf="item.speed">
+            <div>{{item.speed.label}}MB</div>
+            <div>{{item.usage.label}}</div>
+        </div>
+    </div>
+    <div class="deal-logo" *ngIf="item.offer">
+        <img src="{{item.offer.smallLogo}}" />
+    </div>
+    <div class="deal-channels">
+        <div *ngIf="item.tvProduct == null">N/A</div>
+        <div *ngIf="item.tvProduct">
+            <div *ngFor="let c of item.popularChannels" >
+                <img [src]="c.logo" />
+            </div>
+        </div>
+    </div>
+    <div class="deal-mobile">
+        <div *ngIf="item.mobile == null">N/A</div>
+        <div *ngIf="item.mobile">
+            <div *ngFor="let c of item.mobile | keys">{{item.mobile[c].label}}</div>
+        </div>
+    </div>
+    <div class="deal-price">
+        £{{item.prices[0].totalContractCost}}
+    </div>
+</div>

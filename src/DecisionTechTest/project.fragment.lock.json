@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "exports": {
+    "DecisionTech.Domain/1.0.0": {
+      "type": "project",
+      "framework": ".NETFramework,Version=v4.5.2",
+      "compile": {
+        "bin/Debug/DecisionTech.Domain.dll": {}
+      },
+      "runtime": {
+        "../packages/Newtonsoft.Json.10.0.2/lib/net45/Newtonsoft.Json.dll": {},
+        "bin/Debug/DecisionTech.Domain.dll": {}
+      }
+    }
+  }
+}

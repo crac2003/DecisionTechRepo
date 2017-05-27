@@ -1,22 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using DecisionTech.Domain.Models;
+using DecisionTech.Domain.Services;
+using DecisionTech.Domain.Services.Repository; 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using DecisionTechTest.Data;
-using DecisionTechTest.Models;
-using DecisionTechTest.Services;
 
 namespace DecisionTechTest
 {
     public class Startup
     {
+        private string ContentRootPath;
+
         public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()
@@ -24,11 +20,7 @@ namespace DecisionTechTest
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
 
-            if (env.IsDevelopment())
-            {
-                // For more details on using the user secret store see http://go.microsoft.com/fwlink/?LinkID=532709
-                builder.AddUserSecrets();
-            }
+            ContentRootPath = env.ContentRootPath; 
 
             builder.AddEnvironmentVariables();
             Configuration = builder.Build();
@@ -38,20 +30,18 @@ namespace DecisionTechTest
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
-        {
-            // Add framework services.
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-
-            services.AddIdentity<ApplicationUser, IdentityRole>()
-                .AddEntityFrameworkStores<ApplicationDbContext>()
-                .AddDefaultTokenProviders();
-
+        {  
             services.AddMvc();
+            var config = new Config
+            {
+                SystemRoot = ContentRootPath
+            };
+            Configuration.GetSection("app").Bind(config);
+            services.AddSingleton<IConfig>(config);
 
-            // Add application services.
-            services.AddTransient<IEmailSender, AuthMessageSender>();
-            services.AddTransient<ISmsSender, AuthMessageSender>();
+            services.AddSingleton<IProductRepository, JsonFileProductRepository>();
+            services.AddSingleton<ISearchService, SearchService>();
+            services.AddSingleton<IProductPackageProvider, ProductPackageProvider>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -71,9 +61,7 @@ namespace DecisionTechTest
                 app.UseExceptionHandler("/Home/Error");
             }
 
-            app.UseStaticFiles();
-
-            app.UseIdentity();
+            app.UseStaticFiles(); 
 
             // Add external authentication middleware below. To configure them please see http://go.microsoft.com/fwlink/?LinkID=532715
 
